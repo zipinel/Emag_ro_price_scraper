@@ -58,8 +58,8 @@ selector = ('#page-skin > div.container > div > div:nth-child(2) > div.col-sm-5.
 
 
 ########## A for loop that will run the program for a certain amount of times plus time module used to sleep to prolong the process
-########## If you put for example range(0,30) and time.sleep(1440) then 1440 is a day in seconds and it will check for a month(daily)
-########## Or you can split the 1440 in half and double the 30 from range then you get 2 times per day for one month
+########## If you put for example range(0,30) and time.sleep(86400) then 86400 is a day in seconds and it will check for a month(daily)
+########## Or you can split the 86400 in half and double the 30 from range then you get 2 times per day for one month
 ########## I've set some low values now just for you to test it first
 for i in range(0,2):
     data = scraper(webToScrape,selector)
