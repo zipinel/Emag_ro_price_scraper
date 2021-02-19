@@ -1,7 +1,7 @@
 ###### A web scrapper that will get the price from EMAG.ro website and save all the history within a text file locally
 ###### You can monitor the price fluctuation history to see if deals are really good deals
 ###### You can set up a certain price drop point to send an email to you as notification. You get the price in the email
-###### The program will work without the email notification part if you comment out line 68, 69 and 70
+###### The program will work without the email notification part if you comment out line 69, 70 and 71
 
 
 ###### python libraries to import. bs4 needs to be installed with pip, as it is not standard library
@@ -59,7 +59,8 @@ selector = ('#page-skin > div.container > div > div:nth-child(2) > div.col-sm-5.
 
 ########## A for loop that will run the program for a certain amount of times plus time module used to sleep to prolong the process
 ########## If you put for example range(0,30) and time.sleep(1440) then 1440 is a day in seconds and it will check for a month(daily)
-########## Or you can split the 1440 in half and double the 30 from range and you get 2 times per day for one month
+########## Or you can split the 1440 in half and double the 30 from range then you get 2 times per day for one month
+########## I've set some low values now just for you to test it first
 for i in range(0,2):
     data = scraper(webToScrape,selector)
     fileContent = data[0]
@@ -72,4 +73,4 @@ for i in range(0,2):
     time.sleep(3)
 
 ########## Of course don't forget that you must have a computer running and/or the program live
-########## You can remove the email notification function if you just comment out line 68,69 and 70
+########## REMEMBER You can remove the email notification function if you just comment out line 69,70 and 71
