@@ -1,7 +1,7 @@
 ###### A web scrapper that will get the price from EMAG.ro website and save all the history within a text file locally
 ###### You can monitor the price fluctuation history to see if deals are really good deals
 ###### You can set up a certain price drop point to send an email to you as notification. You get the price in the email
-###### The program will work without the email notification part. Notice that the email notification functionality is turned off by default. If you want to use it, just uncomment line 89, 90, 91
+###### The program will work without the email notification part. Notice that the email notification functionality is turned off by default. If you want to use it, just uncomment lines from FOR LOOP Part of the code
 
 
 ###### python libraries to import. bs4 needs to be installed with pip, as it is not standard library
@@ -17,7 +17,7 @@ def fileCreator(filename, content):
         fileWriter.write(timeis + ' - ' + str(content) + ' RON\n')
 
 
-########## a local (your country) timestamp creator
+########## a local timestamp creator
 def timeStamp():
     seconds = time.time()
     local_time = time.ctime(seconds)
@@ -26,9 +26,7 @@ def timeStamp():
 
 
 ########## A function that will be used in case the price drops under certain price, it will send an email
-########## The functions accepts an arguement msg. It must always be a string
-########## Program will not work without the credentials entered below
-def emailNote(msg):
+def emailNote(msg):             ##### msg can only be a String
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
     server.login("youremail@gmail.com", "password")
@@ -36,23 +34,20 @@ def emailNote(msg):
     server.quit()
 
 
-########## The actual scrapper where you send as arguements the page to check and the selector of element to store
-########## Requests module gets the page, bs4 parse the info and uses selector to reach your element
-########## Then re.compile wants ONLY number of 4 digits(ex 2.099) and returns it
-########## If you are looking at different values then format accordingly at re.compile (ex: for 233 you put re.compile(r'\d\d\d'))
+########## The actual scrapper where you send as arguements the page to check and the selector of element to store. After ,just change with web and selector you need
 def scraper(url,selector):
     rawRequest = requests.get(url)
     rawRequest.raise_for_status()
     soup = bs4.BeautifulSoup(rawRequest.text, 'html.parser')
     element = soup.select(selector)
-    formatOfPrice = re.compile(r'\d.\d\d\d')
+    formatOfPrice = re.compile(r'\d.\d\d\d')            ########## re.compile wants ONLY number of 4 digits(ex 2.099). For own use format accordingly at re.compile (ex: for 233 you put re.compile(r'\d\d\d'))
     match = formatOfPrice.findall(element[0].text)
     return match
 
 
 ########### For the purpose to test the code yourself, you can use the web page and selector below
 ########### If you want to use it for yourself, change web to where you look at and selector
-########### (check bs4 docs for more options than COPY CSS SELECTOR option chosen here)
+########### (check bs4 docs for more options for selector. Below is a COPY CSS SELECTOR example)
 webToScrape = ('https://www.emag.ro/televizor-lg-139-cm-smart-4k-ultra-hd-led-clasa-a-55un73003la/pd/D4GCJMMBM/')
 selector = ('#page-skin > div.container > div > div:nth-child(2) > div.col-sm-5.col-md-7.col-lg-7 > div > div > div.col-sm-12.col-md-6.col-lg-5 > form > div.product-highlight.product-page-pricing > div:nth-child(1) > div > div.w-50.mrg-rgt-xs > p.product-new-price')
 
@@ -92,5 +87,3 @@ for i in range(0,2):
     fileCreator('Emag',integerToCompare)
     time.sleep(3)
 
-########## Of course don't forget that you must have a computer running and/or the program live
-########## Notice that the email notification functionality is turned off by default. If you want to use it, just uncomment line 89, 90, 91
