@@ -1,12 +1,13 @@
 ###### A web scrapper that will get the price from EMAG.ro website and save all the history within a text file locally
 ###### You can monitor the price fluctuation history to see if deals are really good deals
 ###### You can set up a certain price drop point to send an email to you as notification. You get the price in the email
-###### The program will work without the email notification part if you comment out line 69, 70 and 71
+###### The program will work without the email notification part if you comment out line 68, 69 and 70
 
 
 ###### python libraries to import. bs4 needs to be installed with pip, as it is not standard library
 import requests, bs4, re, time
 import smtplib
+import psycopg2 as pg2
 
 
 ########## We want to save locally all the scraping on to a text file, together with timestamp
@@ -35,7 +36,6 @@ def emailNote(msg):
     server.quit()
 
 
-
 ########## The actual scrapper where you send as arguements the page to check and the selector of element to store
 ########## Requests module gets the page, bs4 parse the info and uses selector to reach your element
 ########## Then re.compile wants ONLY number of 4 digits(ex 2.099) and returns it
@@ -49,6 +49,7 @@ def scraper(url,selector):
     match = formatOfPrice.findall(element[0].text)
     return match
 
+
 ########### For the purpose to test the code yourself, you can use the web page and selector below
 ########### If you want to use it for yourself, change web to where you look at and selector
 ########### (check bs4 docs for more options than COPY CSS SELECTOR option chosen here)
@@ -56,21 +57,40 @@ webToScrape = ('https://www.emag.ro/televizor-lg-139-cm-smart-4k-ultra-hd-led-cl
 selector = ('#page-skin > div.container > div > div:nth-child(2) > div.col-sm-5.col-md-7.col-lg-7 > div > div > div.col-sm-12.col-md-6.col-lg-5 > form > div.product-highlight.product-page-pricing > div:nth-child(1) > div > div.w-50.mrg-rgt-xs > p.product-new-price')
 
 
+########### add1data will write the price scraped INTO the database and showLastQuery is here just for debugging purpose so you can see the confirmation straight from the database that the update was performed
+########### Notice that in this case you work with a database already created. In here database is named emagscrape, table is named allprices and it has 2 columns, first is price which is the value we scrape and second is exact_time which is a time stamp of the update into db action
+def add1data(query):
+    conn = pg2.connect(dbname='emagscrape',user='postgres',password='yourPasswordHere')      ###########  user for the PostgreSQL is set to default which is postgres. But do not forget to insert your password here
+    cur = conn.cursor()
+    priceToReturn = cur.execute("INSERT INTO allprices(price) VALUES({});".format(query))
+    conn.commit()
+    conn.close()
 
+def showLastQuery():
+    conn = pg2.connect(dbname='emagscrape',user='postgres',password='yourPasswordHere')
+    cur = conn.cursor()
+    cur.execute("SELECT price FROM allprices ORDER BY exact_time DESC LIMIT 1;")
+    return cur.fetchall()
+    conn.close()
+
+    
 ########## A for loop that will run the program for a certain amount of times plus time module used to sleep to prolong the process
-########## If you put for example range(0,30) and time.sleep(86400) then 86400 is a day in seconds and it will check for a month(daily)
-########## Or you can split the 86400 in half and double the 30 from range then you get 2 times per day for one month
-########## I've set some low values now just for you to test it first
+########## If you put for example range(0,30) and time.sleep(1440) then 1440 is a day in seconds and it will check for a month(daily)
+########## Or you can split the 1440 in half and double the 30 from range and you get 2 times per day for one month
 for i in range(0,2):
     data = scraper(webToScrape,selector)
     fileContent = data[0]
+    print('Data scraped from the web: ' + fileContent)
+    add1data(fileContent)
+    lastQuery = showLastQuery()
+    print('Database succesfully updated with value: '+lastQuery[0][0])
     withoutDot = fileContent.replace(".","")
     integerToCompare = int(withoutDot)
-    if integerToCompare > 1900:              ##### here we set a desired price to trigger a function
-        stringIt = str(integerToCompare)
-        emailNote(stringIt)                  ##### a function that will send us a notification email about price drop
+    # if integerToCompare > 1900:              ##### here we set a desired price to trigger a function
+    # stringIt = str(integerToCompare)
+    # emailNote(stringIt)                  ##### a function that will send us a notification email about price drop
     fileCreator('Emag',integerToCompare)
     time.sleep(3)
 
 ########## Of course don't forget that you must have a computer running and/or the program live
-########## REMEMBER You can remove the email notification function if you just comment out line 69,70 and 71
+########## Notice that the email notification functionality is turned off by default. If you want to use it, just uncomment line 88, 89, 90
