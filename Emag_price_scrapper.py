@@ -1,7 +1,7 @@
 ###### A web scrapper that will get the price from EMAG.ro website and save all the history within a text file locally
 ###### You can monitor the price fluctuation history to see if deals are really good deals
 ###### You can set up a certain price drop point to send an email to you as notification. You get the price in the email
-###### The program will work without the email notification part. Notice that the email notification functionality is turned off by default. If you want to use it, just uncomment line 88, 89, 90
+###### The program will work without the email notification part. Notice that the email notification functionality is turned off by default. If you want to use it, just uncomment line 89, 90, 91
 
 
 ###### python libraries to import. bs4 needs to be installed with pip, as it is not standard library
@@ -93,4 +93,4 @@ for i in range(0,2):
     time.sleep(3)
 
 ########## Of course don't forget that you must have a computer running and/or the program live
-########## Notice that the email notification functionality is turned off by default. If you want to use it, just uncomment line 88, 89, 90
+########## Notice that the email notification functionality is turned off by default. If you want to use it, just uncomment line 89, 90, 91
